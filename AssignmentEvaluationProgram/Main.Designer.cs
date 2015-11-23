@@ -147,7 +147,7 @@
             this.userType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.userType.FormattingEnabled = true;
             this.userType.Items.AddRange(new object[] {
-            "Professor",
+            "Prof.",
             "T.A.",
             "기타"});
             this.userType.Location = new System.Drawing.Point(134, 86);
@@ -208,7 +208,7 @@
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(69, 12);
             this.label3.TabIndex = 24;
-            this.label3.Text = "사용자 이름";
+            this.label3.Text = "채점자 이름";
             // 
             // label2
             // 
@@ -217,7 +217,7 @@
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(69, 12);
             this.label2.TabIndex = 23;
-            this.label2.Text = "사용자 구분";
+            this.label2.Text = "채점자 구분";
             // 
             // label1
             // 
@@ -302,8 +302,10 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Name = "Main";
-            this.Text = "Form1";
+            this.Text = "Assignment Evaluater";
             this.ResumeLayout(false);
             this.PerformLayout();
 

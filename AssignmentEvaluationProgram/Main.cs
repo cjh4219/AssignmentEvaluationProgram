@@ -144,10 +144,11 @@ namespace AssignmentEvaluationProgram
                     data.setSubmit(false);
                 }
             }
-            writeExcel(studentList, excelFilePath, fileName);
+            //writeExcel_OleDB(studentList, excelFilePath, fileName);
+            writeExcel_CSV(studentList, fileName);
         }
 
-        private DataTable readExcel(string strFilePath, string sheetName)
+        private DataTable readExcel_OleDB(string strFilePath, string sheetName)
         {
             object missing = System.Reflection.Missing.Value;
 
@@ -195,7 +196,7 @@ namespace AssignmentEvaluationProgram
         private List<Student> seekStudentList(string strFilePath, string sheetName)
         {
 
-            DataTable dTable = readExcel(strFilePath, sheetName);
+            DataTable dTable = readExcel_OleDB(strFilePath, sheetName);
 
             Regex reg = new Regex(@"^[0-9]+[0-9]+[0-9]+[0-9]+[0-9]+[0-9]+[0-9]+[0-9]*$");
 
@@ -204,7 +205,6 @@ namespace AssignmentEvaluationProgram
             // dTable에 추출된 내용을 String으로 변환
             foreach (DataRow row in dTable.Rows)
             {
-
                 foreach (DataColumn Col in dTable.Columns)
                 {
                     if (reg.IsMatch(row[Col].ToString()))
@@ -227,11 +227,7 @@ namespace AssignmentEvaluationProgram
             else
                 return false;
         }
-
-        private void chec_child()
-        {
-        }
-
+        
         private void executeCompileTest(string directoryPath, int time, List<string> testFiles)
         {
             Process bat = new Process();
@@ -295,7 +291,7 @@ namespace AssignmentEvaluationProgram
             }
         }
         
-        private void writeExcel(List<Student> data, string strFilePath, string fileName)
+        private void writeExcel_OleDB(List<Student> data, string strFilePath, string fileName)
         {
             object missing = System.Reflection.Missing.Value;
 
@@ -356,6 +352,98 @@ namespace AssignmentEvaluationProgram
 
             excelConnection.Close();
 
+        }
+
+        private void writeExcel_CSV(List<Student> data, string fileName)
+        {
+            //file path setting
+            string savePath = folderDialog.SelectedPath;
+            if (courseName.Text.Length > 0 && HWNo.Text.Length > 0)
+            {
+                savePath += "\\" + courseName.Text + "_HW" + HWNo.Text;
+            }
+            else if (courseName.Text.Length > 0 && HWNo.Text.Length == 0)
+            {
+                savePath += "\\" + courseName.Text + "_HW";
+            }
+            else if (courseName.Text.Length == 0 && HWNo.Text.Length > 0)
+            {
+                savePath += "\\_HW" + HWNo.Text;
+            }
+            else
+            {
+                savePath += "\\Homework";
+            }
+
+            StreamWriter sw = new StreamWriter(savePath + ".csv", false, Encoding.Unicode);
+            sw.Flush();
+
+            #region write header part
+            //header setting
+            string header = "";
+            if (courseName.Text.Length > 0 && HWNo.Text.Length > 0)
+            {
+                header += courseName.Text + "_HW" + HWNo.Text + "\r\n";
+            }
+            else if (courseName.Text.Length > 0 && HWNo.Text.Length == 0)
+            {
+                header += courseName.Text + "_Homework\r\n";
+            }
+            else if (courseName.Text.Length == 0 && HWNo.Text.Length > 0)
+            {
+                header += "Homework" + HWNo.Text + "\r\n";
+            }
+            else
+            {
+                header += "Homework\r\n";
+            }
+            //write header
+            sw.Write(header);
+
+            //user info setting
+            string userInfo = "채점자: ";
+            if (userType.SelectedItem != null && userName.Text.Length > 0)
+            {
+                userInfo += userName.Text + "(" + userType.SelectedItem.ToString() + ")\r\n";
+            }
+            else if (userType.SelectedItem != null && userName.Text.Length == 0)
+            {
+                userInfo += userType.SelectedItem.ToString() + "\r\n";
+            }
+            else if (userType.SelectedItem == null && userName.Text.Length > 0)
+            {
+                userInfo += userName.Text + "\r\n";
+            }
+            else
+            {
+                userInfo = "";
+            }
+            sw.Write(userInfo);
+
+            if (eMailAddr.Text.Length > 0)
+            {
+                sw.Write("문의: " + eMailAddr.Text + "\r\n");
+            }
+
+            //write columns info
+            sw.Write("학번\t이름\t제출여부\t점수\r\n");
+            #endregion
+
+            //write content
+            foreach (Student eachPerson in data)
+            {
+                string submit;
+                if (eachPerson.getSubmit() == true)
+                    submit = "Yes";
+                else
+                    submit = "No";
+
+                string str = "";
+                str += eachPerson.getStdNo() + "\t" + eachPerson.getStdName() + "\t" + submit + "\t" + eachPerson.getPoint().ToString() + "\r\n";
+                sw.Write(str);
+            }
+
+            sw.Close();
         }
 
         private bool folderSelect = false;
